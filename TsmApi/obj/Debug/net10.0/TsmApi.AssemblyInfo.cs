@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TsmApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7e8e408e19ececa5ec0fe077c966a3936a8f8cfc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d105ad0b1004b72011ac212d8fd83078ed2a5499")]
 [assembly: System.Reflection.AssemblyProductAttribute("TsmApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TsmApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
