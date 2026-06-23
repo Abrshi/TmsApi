@@ -1,11 +1,11 @@
 
-
+using TmsApi; // Or use the exact namespace found at the top of your EnrollmentWorker.cs file
 var builder = WebApplication.CreateBuilder(args);
 
 // Services
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
-// 1. Register the services with conflicting lifetimes
+// These registrations are given do NOT change them:
 builder.Services.AddSingleton<EnrollmentWorker>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 
