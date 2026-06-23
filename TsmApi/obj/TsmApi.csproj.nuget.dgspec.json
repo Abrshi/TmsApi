@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\user\\Desktop\\qiyas\\lab\\m4\\tsmapi\\TsmApi.csproj": {}
+    "C:\\Users\\user\\Desktop\\qiyas\\lab\\m4\\TsmApi\\TsmApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\user\\Desktop\\qiyas\\lab\\m4\\tsmapi\\TsmApi.csproj": {
+    "C:\\Users\\user\\Desktop\\qiyas\\lab\\m4\\TsmApi\\TsmApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\user\\Desktop\\qiyas\\lab\\m4\\tsmapi\\TsmApi.csproj",
+        "projectUniqueName": "C:\\Users\\user\\Desktop\\qiyas\\lab\\m4\\TsmApi\\TsmApi.csproj",
         "projectName": "TsmApi",
-        "projectPath": "C:\\Users\\user\\Desktop\\qiyas\\lab\\m4\\tsmapi\\TsmApi.csproj",
+        "projectPath": "C:\\Users\\user\\Desktop\\qiyas\\lab\\m4\\TsmApi\\TsmApi.csproj",
         "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\user\\Desktop\\qiyas\\lab\\m4\\tsmapi\\obj\\",
+        "outputPath": "C:\\Users\\user\\Desktop\\qiyas\\lab\\m4\\TsmApi\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config"
