@@ -15,7 +15,7 @@ builder.Services.AddOptions<PaymentOptions>()
 // These registrations are given do NOT change them:
 builder.Services.AddSingleton<EnrollmentWorker>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
-
+builder.Services.AddControllers();
 // 2. Add host validation to catch illegal lifetime wiring early
 builder.Host.UseDefaultServiceProvider(options =>
 {
@@ -29,7 +29,7 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.MapControllers();
 // Protected endpoint
 app.MapGet("/api/assessments/results", () => Results.Ok(new
 {
