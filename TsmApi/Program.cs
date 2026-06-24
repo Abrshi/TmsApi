@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Services
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
+builder.Services.AddProblemDetails();
 // Exercise 3 - Options Pattern
 builder.Services.AddOptions<PaymentOptions>()
     .BindConfiguration("Payments")
@@ -26,6 +27,9 @@ builder.Host.UseDefaultServiceProvider(options =>
 builder.Services.AddControllers();
 
 var app = builder.Build();
+app.UseExceptionHandler();
+
+app.UseStatusCodePages();
 app.UseMiddleware<RequestLoggingMiddleware>(); 
 // Pipeline
 app.UseRouting();
@@ -42,4 +46,10 @@ app.MapGet("/api/assessments/results", () => Results.Ok(new
 }))
 .RequireAuthorization();
 
+
+app.MapGet("/api/error", () =>
+{
+    throw new TmsDatabaseException(
+        "Simulated database failure for ProblemDetails testing");
+});
 app.Run();
