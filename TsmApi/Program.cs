@@ -14,14 +14,17 @@ builder.Services.AddOptions<PaymentOptions>()
 
 // These registrations are given do NOT change them:
 builder.Services.AddSingleton<EnrollmentWorker>();
-builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
-builder.Services.AddControllers();
+builder.Services.AddSingleton<IEnrollmentService, EnrollmentService>();
+
 // 2. Add host validation to catch illegal lifetime wiring early
 builder.Host.UseDefaultServiceProvider(options =>
 {
     options.ValidateScopes = true;
     options.ValidateOnBuild = true;
 });
+
+builder.Services.AddControllers();
+
 var app = builder.Build();
 app.UseMiddleware<RequestLoggingMiddleware>(); 
 // Pipeline
