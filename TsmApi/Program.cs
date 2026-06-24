@@ -1,23 +1,26 @@
+using Scalar.AspNetCore;
+using TmsApi;
 
-using TmsApi; // Or use the exact namespace found at the top of your EnrollmentWorker.cs file
 var builder = WebApplication.CreateBuilder(args);
 
-// Services
+// ---------------- SERVICES ----------------
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
+
 builder.Services.AddProblemDetails();
+builder.Services.AddOpenApi();
+
 // Exercise 3 - Options Pattern
 builder.Services.AddOptions<PaymentOptions>()
     .BindConfiguration("Payments")
     .ValidateDataAnnotations()
-    .ValidateOnStart();    
+    .ValidateOnStart();
 
-
-// These registrations are given do NOT change them:
+// Given registrations (DO NOT CHANGE)
 builder.Services.AddSingleton<EnrollmentWorker>();
 builder.Services.AddSingleton<IEnrollmentService, EnrollmentService>();
 
-// 2. Add host validation to catch illegal lifetime wiring early
+// Host validation
 builder.Host.UseDefaultServiceProvider(options =>
 {
     options.ValidateScopes = true;
@@ -27,16 +30,34 @@ builder.Host.UseDefaultServiceProvider(options =>
 builder.Services.AddControllers();
 
 var app = builder.Build();
+
+// ---------------- MIDDLEWARE ----------------
+
+// Routing must come early
+app.UseRouting();
+
+// Global error handling (ProblemDetails)
 app.UseExceptionHandler();
 
+// Converts empty responses (like 404) into JSON ProblemDetails
 app.UseStatusCodePages();
-app.UseMiddleware<RequestLoggingMiddleware>(); 
-// Pipeline
-app.UseRouting();
+
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
+
+// ---------------- ENVIRONMENT TOOLS ----------------
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
+
+// ---------------- TEST ENDPOINTS ----------------
+
 // Protected endpoint
 app.MapGet("/api/assessments/results", () => Results.Ok(new
 {
@@ -46,10 +67,11 @@ app.MapGet("/api/assessments/results", () => Results.Ok(new
 }))
 .RequireAuthorization();
 
-
+// Error test endpoint (for ProblemDetails)
 app.MapGet("/api/error", () =>
 {
     throw new TmsDatabaseException(
         "Simulated database failure for ProblemDetails testing");
 });
+
 app.Run();
