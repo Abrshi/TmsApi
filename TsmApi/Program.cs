@@ -64,8 +64,8 @@ app.MapGet("/api/assessments/results", () => Results.Ok(new
     courseCode = "CS-101",
     studentId = "S-001",
     letterGrade = "A"
-}))
-.RequireAuthorization();
+}));
+
 
 // Error test endpoint (for ProblemDetails)
 app.MapGet("/api/error", () =>
