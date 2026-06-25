@@ -1,14 +1,16 @@
 using Scalar.AspNetCore;
 using TmsApi;
-
+using Microsoft.EntityFrameworkCore;
+using TmsApi.Data;
 var builder = WebApplication.CreateBuilder(args);
 
-// ---------------- SERVICES ----------------
+//  SERVICES 
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
+//
 
 // Exercise 3 - Options Pattern
 builder.Services.AddOptions<PaymentOptions>()
@@ -29,9 +31,13 @@ builder.Host.UseDefaultServiceProvider(options =>
 
 builder.Services.AddControllers();
 
+// Register TmsDbContext scoped for incoming HTTP requests
+builder.Services.AddDbContext<TmsDbContext>(options =>
+options.UseNpgsql(builder.Configuration.GetConnectionString("TmsDatabase")));
+
 var app = builder.Build();
 
-// ---------------- MIDDLEWARE ----------------
+//  MIDDLEWARE 
 
 // Routing must come early
 app.UseRouting();
@@ -49,14 +55,14 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// ---------------- ENVIRONMENT TOOLS ----------------
+//  ENVIRONMENT TOOLS 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
 
-// ---------------- TEST ENDPOINTS ----------------
+//  TEST ENDPOINTS 
 
 // Protected endpoint
 app.MapGet("/api/assessments/results", () => Results.Ok(new
