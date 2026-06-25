@@ -86,21 +86,7 @@ public class TestController : ControllerBase
     
     // 4. MOST ENROLLED COURSES
     
-    [HttpGet("top-courses")]
-    public async Task<IActionResult> TopCourses()
-    {
-        var list = await context.Courses
-            .Select(c => new
-            {
-                c.Title,
-                EnrollmentCount = c.Enrollments.Count
-            })
-            .OrderByDescending(x => x.EnrollmentCount)
-            .ToListAsync();
-
-        return Ok(list);
-    }
-
+   
     
     // 5. AVERAGE GPA PER COURSE
     
@@ -156,4 +142,36 @@ public class TestController : ControllerBase
 
         return Ok(list);
     }
+
+    [HttpGet("students-paged")]
+public async Task<IActionResult> GetStudentsPaged(
+    int page = 1,
+    int pageSize = 20)
+{
+    if (page < 1) page = 1;
+
+    var students = await context.Students
+        .OrderBy(s => s.Name) // MUST come first
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+    return Ok(students);
+}
+
+[HttpGet("top-courses")]
+public async Task<IActionResult> TopCourses()
+{
+    var list = await context.Courses
+        .Select(c => new
+        {
+            c.Title,
+            EnrollmentCount = c.Enrollments.Count
+        })
+        .OrderByDescending(x => x.EnrollmentCount)
+        .Take(5)
+        .ToListAsync();
+
+    return Ok(list);
+}
 }
