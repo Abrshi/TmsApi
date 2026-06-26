@@ -3,6 +3,7 @@ using TmsApi;
 using Microsoft.EntityFrameworkCore;
 using TmsApi.Data;
 using TmsApi.Entities;
+using TmsApi.Exercises;
 var builder = WebApplication.CreateBuilder(args);
 
 //  SERVICES 
@@ -130,6 +131,12 @@ using (var scope = app.Services.CreateScope())
         context.SaveChanges();
     }
 }
+Console.WriteLine("starting Exercise 7: Count enrollments for each student...");
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<TmsDbContext>();
 
-
+    await Exercise7.Run(db);
+}
+Console.WriteLine("Exercise 7 completed.");
 app.Run();
