@@ -22,4 +22,8 @@ public class Student
 
     // many-to-many navigation property
     public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+
+    public uint Version { get; set; }
+
+    public bool IsDeleted { get; set; }
 }

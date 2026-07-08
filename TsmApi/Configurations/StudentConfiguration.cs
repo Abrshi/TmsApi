@@ -19,9 +19,22 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
         builder.Property(s => s.GPA)
             .HasPrecision(3, 2);
 
+        // Shadow Property
+        builder.Property<DateTime>("LastUpdated");
+
+        // Concurrency Token
+        builder.Property(s => s.Version)
+            .IsRowVersion();
+
         // Relationships
         builder.HasMany(s => s.Enrollments)
             .WithOne(e => e.Student)
             .HasForeignKey(e => e.StudentId);
+
+
+            // exersise 9
+        builder.Property(s => s.IsDeleted)
+            .HasDefaultValue(false);
+        builder.HasQueryFilter(s => !s.IsDeleted);
     }
 }
