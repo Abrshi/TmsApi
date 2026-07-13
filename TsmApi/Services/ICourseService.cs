@@ -1,0 +1,11 @@
+using TmsApi.Entities;
+using Tms.Api.Dtos;
+namespace TmsApi.Services;
+
+public interface ICourseService
+{
+       Task<CourseResponseDto?> GetByIdAsync(int id, CancellationToken ct);
+    Task<CourseResponseDto> CreateAsync(CreateCourseRequest request,CancellationToken ct);
+
+    
+}
