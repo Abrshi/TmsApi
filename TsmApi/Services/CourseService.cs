@@ -10,6 +10,7 @@ public class CourseService(
     ILogger<CourseService> logger)
     : ICourseService
 {
+    public Task<bool> CodeExistsAsync(string code, CancellationToken ct)=>context.Courses.AsNoTracking().AnyAsync(c => c.Code == code, ct);
     public async Task<CourseResponseDto?> GetByIdAsync(
         int id,
         CancellationToken ct)
