@@ -4,11 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using TmsApi.Data;
 using TmsApi.Entities;
 using TmsApi.Exercises;
+using TmsApi.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 //  SERVICES 
-builder.Services.AddAuthentication();
-builder.Services.AddAuthorization();
+// builder.Services.AddAuthentication();
+// builder.Services.AddAuthorization();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
@@ -40,6 +41,11 @@ options.UseNpgsql(builder.Configuration.GetConnectionString("TmsDatabase"))
 .LogTo(Console.WriteLine, LogLevel.Information) // Log SQLto output window
 .EnableSensitiveDataLogging()); // Show parameters in querylogs (dev only)
 
+
+
+builder.Services.AddScoped<ICourseService, CourseService>();
+
+
 var app = builder.Build();
 
 //  MIDDLEWARE 
@@ -55,8 +61,8 @@ app.UseStatusCodePages();
 
 app.UseMiddleware<RequestLoggingMiddleware>();
 
-app.UseAuthentication();
-app.UseAuthorization();
+// app.UseAuthentication();
+// app.UseAuthorization();
 
 app.MapControllers();
 
@@ -109,9 +115,9 @@ using (var scope = app.Services.CreateScope())
 
         var courses = new List<Course>
         {
-            new() { Code = "CS-101", Title = "Introduction to Computer Science", Capacity = 30 },
-            new() { Code = "CS-201", Title = "Data Structures and Algorithms", Capacity = 25 },
-            new() { Code = "MAT-101", Title = "Calculus I", Capacity = 40 }
+            new() { Code = "CS-101", Title = "Introduction to Computer Science", MaxCapacity = 30 },
+            new() { Code = "CS-201", Title = "Data Structures and Algorithms", MaxCapacity = 25 },
+            new() { Code = "MAT-101", Title = "Calculus I", MaxCapacity = 40 }
         };
 
         context.Courses.AddRange(courses);
