@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Tms.Api.Dtos;
-using TmsApi.Services;
+using TmsApi.Services.ICourseService;
 
 namespace TmsApi.Controllers;
 
@@ -24,7 +24,13 @@ public class CoursesController(ICourseService courseService)
         return Ok(course);
     }
 
-
+[HttpGet]
+public async Task<IActionResult> GetCourses(
+[FromQuery] PagedRequest request, CancellationToken ct)
+{
+var result = await courseService.GetCoursesAsync(request, ct);
+return Ok(result);
+}
   [HttpPost]
 public async Task<IActionResult> CreateCourse(
     CreateCourseRequest request,

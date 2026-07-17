@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using TmsApi.Data;
 using TmsApi.Entities;
 using TmsApi.Exercises;
-using TmsApi.Services;
+using TmsApi.Services.ICourseService;
+using TmsApi.Persistence;
+using TmApi.Filters;
 var builder = WebApplication.CreateBuilder(args);
 
 //  SERVICES 
@@ -32,8 +34,10 @@ builder.Host.UseDefaultServiceProvider(options =>
     options.ValidateOnBuild = true;
 });
 
-builder.Services.AddControllers();
-
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<AuditLogFilter>();
+});
 // Register TmsDbContext scoped for incoming HTTP requests
 
 builder.Services.AddDbContext<TmsDbContext>(options =>
@@ -145,4 +149,13 @@ using (var scope = app.Services.CreateScope())
     await Exercise7.Run(db);
 }
 Console.WriteLine("Exercise 7 completed.");
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+
+    var context = scope.ServiceProvider
+        .GetRequiredService<TmsDbContext>();
+
+    await DataSeeder.SeedAsync(context);
+}
 app.Run();
