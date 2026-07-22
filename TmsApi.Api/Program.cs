@@ -1,7 +1,7 @@
 using Scalar.AspNetCore;
 using TmsApi;
 using Microsoft.EntityFrameworkCore;
-using TmsApi.Data;
+using TmsApi.Infrastructure.Persistence;
 using TmsApi.Entities;
 using TmsApi.Exercises;
 using TmsApi.Services;

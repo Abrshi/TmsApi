@@ -1,4 +1,4 @@
-namespace TmsApi.Entities;
+namespace TmsApi.Domain.Entities;
 
 using System.ComponentModel.DataAnnotations;
 

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TmsApi.Entities;
+using TmsApi.Domain.Entities;
 
-namespace TmsApi.Configurations;
+namespace TmsApi.Infrastructure.Persistence.Configurations;
 
 public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
 {
