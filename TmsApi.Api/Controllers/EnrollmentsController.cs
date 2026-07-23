@@ -1,14 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
-using Tms.Api.Dtos;
-using TmsApi.Services;
+using TmsApi.Application.DTOs;
 
-namespace Tms.Api.Controllers;
+using TmsApi.Infrastructure.Services;
+using TmsApi.Infrastructure.Persistence.Configurations;
+
+namespace TmsApi.Api.Controllers; // ✅ Fix: Matches TmsApi.Api format
 
 [ApiController]
 [Route("api/courses/{courseId:int}/enrollments")]
 public class EnrollmentsController(
     ICourseService courseService,
-    TmsApi.Services.IEnrollmentService enrollmentService)
+    IEnrollmentService enrollmentService) // ✅ Fix: Clean interface reference
     : ControllerBase
 {
     [HttpGet("{id:int}", Name = nameof(GetEnrollment))]
@@ -17,10 +19,10 @@ public class EnrollmentsController(
         int id,
         CancellationToken ct)
     {
-        var enrollment = await enrollmentService.GetByIdAsync(
-            courseId,
-            id,
-            ct);
+       var enrollment = await enrollmentService.GetByIdAsync(
+        courseId,
+        id,
+        ct);
 
         return enrollment is not null
             ? Ok(enrollment)
@@ -53,10 +55,11 @@ public class EnrollmentsController(
             });
         }
 
-        var enrollment = await enrollmentService.CreateAsync(
-            courseId,
-            request,
-            ct);
+         var enrollment = await enrollmentService.CreateAsync(
+                courseId,
+                request,
+                ct);
+
 
         return CreatedAtAction(
             nameof(GetEnrollment),

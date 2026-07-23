@@ -1,19 +1,19 @@
 // --- The contract ---
-public interface IEnrollmentService
+public interface IInMemoryEnrollmentService
 {
     Task<EnrollmentRecord> EnrollAsync(string studentId, string courseCode);
-    Task<EnrollmentRecord?> GetByIdAsync(string id);
+    Task<EnrollmentRecord?> GetByIdAsync(string id );
     Task<IReadOnlyList<EnrollmentRecord>> GetAllAsync();
     Task<bool> DeleteAsync(string id);
 }
 
 // --- The in-memory implementation ---
-public class EnrollmentService : IEnrollmentService
+public class InMemoryEnrollmentService : IInMemoryEnrollmentService
 {
     private readonly Dictionary<string, EnrollmentRecord> _store = new();
-    private readonly ILogger<EnrollmentService> _logger;
+    private readonly ILogger<InMemoryEnrollmentService> _logger;
 
-    public EnrollmentService(ILogger<EnrollmentService> logger)
+    public InMemoryEnrollmentService(ILogger<InMemoryEnrollmentService> logger)
     {
         _logger = logger;
     }

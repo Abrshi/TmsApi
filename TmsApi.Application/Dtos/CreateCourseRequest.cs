@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-namespace Tms.Api.Dtos;
+namespace TmsApi.Application.DTOs;
 public record CreateCourseRequest
 {
 [Required, RegularExpression(@"^[A-Z]{3}-\d{3}$",

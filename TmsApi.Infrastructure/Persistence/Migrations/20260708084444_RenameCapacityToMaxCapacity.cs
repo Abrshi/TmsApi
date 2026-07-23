@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace TsmApi.Migrations
+namespace TmsApi.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class RenameCapacityToMaxCapacity : Migration
@@ -65,3 +65,4 @@ namespace TsmApi.Migrations
         }
     }
 }
+

@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-
+using TmsApi.Infrastructure.Services;
 namespace TmsApi; // Use your actual project namespace here
 
 public class EnrollmentWorker(IServiceScopeFactory scopeFactory)

@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace TsmApi.Migrations
+namespace TmsApi.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class AddStudentRowVersion : Migration
@@ -28,3 +28,4 @@ namespace TsmApi.Migrations
         }
     }
 }
+

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using TmsApi.Data;
-
+using TmsApi.Application.DTOs;
+using TmsApi.Infrastructure.Persistence;
 namespace TmsApi.Exercises;
 
 public static class Exercise7

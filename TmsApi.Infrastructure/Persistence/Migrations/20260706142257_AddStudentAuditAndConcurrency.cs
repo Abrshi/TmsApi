@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace TsmApi.Migrations
+namespace TmsApi.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class AddStudentAuditAndConcurrency : Migration
@@ -40,3 +40,4 @@ namespace TsmApi.Migrations
         }
     }
 }
+

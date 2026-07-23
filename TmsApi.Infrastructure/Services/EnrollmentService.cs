@@ -1,34 +1,49 @@
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using TmsApi.Domain.Entities;
-using Tms.Api.Dtos;
-using TmsApi.Data;
-
+using TmsApi.Application.DTOs;
+using TmsApi.Infrastructure.Persistence;
 
 namespace TmsApi.Infrastructure.Services;
 
 
 public class EnrollmentService(
     TmsDbContext context,
-    ILogger<EnrollmentService> logger) : IEnrollmentService
+    ILogger<EnrollmentService> logger)
+    : IEnrollmentService
 {
     public Task<EnrollmentResponseDto?> GetByIdAsync(
         int courseId,
         int id,
-        CancellationToken ct)
-    {
-        return context.Enrollments
+        CancellationToken ct) =>
+
+        context.Enrollments
             .AsNoTracking()
-            .Where(e =>
-                e.Id == id &&
-                e.CourseId == courseId)
+            .Where(e => e.Id == id && e.CourseId == courseId)
             .Select(e => new EnrollmentResponseDto(
                 e.Id,
                 e.CourseId,
                 e.StudentId,
                 e.EnrolledAt))
             .FirstOrDefaultAsync(ct);
-    }
+
+
+    public async Task<List<EnrollmentResponseDto>> GetByCourseAsync(
+        int courseId,
+        CancellationToken ct)
+        {
+            return await context.Enrollments
+                .AsNoTracking()
+                .Where(e => e.CourseId == courseId)
+                .Select(e => new EnrollmentResponseDto(
+                    e.Id,
+                    e.CourseId,
+                    e.StudentId,
+                    e.EnrolledAt))
+                .ToListAsync(ct);
+        }        
+
 
     public async Task<EnrollmentResponseDto> CreateAsync(
         int courseId,
@@ -47,18 +62,13 @@ public class EnrollmentService(
         await context.SaveChangesAsync(ct);
 
         logger.LogInformation(
-            "Student {StudentId} enrolled in course {CourseId}. Enrollment ID: {EnrollmentId}",
-            request.StudentId,
-            courseId,
-            enrollment.Id);
+            "Student {StudentId} enrolled in Course {CourseId}",
+            enrollment.StudentId,
+            enrollment.CourseId);
 
-        var result = await GetByIdAsync(
-            courseId,
-            enrollment.Id,
-            ct);
-
-        return result
-            ?? throw new InvalidOperationException(
-                "Enrollment was created but could not be retrieved.");
+        return (await GetByIdAsync(
+             courseId,
+             enrollment.Id, 
+             ct))!;
     }
 }

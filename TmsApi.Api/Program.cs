@@ -2,9 +2,9 @@ using Scalar.AspNetCore;
 using TmsApi;
 using Microsoft.EntityFrameworkCore;
 using TmsApi.Infrastructure.Persistence;
-using TmsApi.Entities;
+using TmsApi.Domain.Entities;
 using TmsApi.Exercises;
-using TmsApi.Services;
+using TmsApi.Infrastructure.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 //  SERVICES 
@@ -23,7 +23,7 @@ builder.Services.AddOptions<PaymentOptions>()
 
 // Given registrations (DO NOT CHANGE)
 builder.Services.AddSingleton<EnrollmentWorker>();
-builder.Services.AddSingleton<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 
 // Host validation
 builder.Host.UseDefaultServiceProvider(options =>
