@@ -5,6 +5,8 @@ using TmsApi.Infrastructure.Persistence;
 using TmsApi.Domain.Entities;
 using TmsApi.Exercises;
 using TmsApi.Infrastructure.Services;
+using Asp.Versioning;
+using TmsApi.Api.Middleware;
 var builder = WebApplication.CreateBuilder(args);
 
 //  SERVICES 
@@ -31,6 +33,21 @@ builder.Host.UseDefaultServiceProvider(options =>
     options.ValidateScopes = true;
     options.ValidateOnBuild = true;
 });
+
+// m7s1
+builder.Services.AddApiVersioning(options =>
+{
+options.DefaultApiVersion = new ApiVersion(1, 0);
+options.AssumeDefaultVersionWhenUnspecified = true;
+options.ReportApiVersions = true;
+options.ApiVersionReader = new UrlSegmentApiVersionReader();
+})
+.AddApiExplorer(options =>
+{
+options.GroupNameFormat = "'v'VVV";
+options.SubstituteApiVersionInUrl = true;
+});
+// ===============
 
 builder.Services.AddControllers();
 
@@ -63,7 +80,7 @@ app.UseMiddleware<RequestLoggingMiddleware>();
 
 // app.UseAuthentication();
 // app.UseAuthorization();
-
+app.UseMiddleware<V1DeprecationMiddleware>();
 app.MapControllers();
 
 //  ENVIRONMENT TOOLS 
