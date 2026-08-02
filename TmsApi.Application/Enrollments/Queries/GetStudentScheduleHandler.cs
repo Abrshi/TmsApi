@@ -1,5 +1,6 @@
 using MediatR;
 using TmsApi.Application.Interfaces;
+using TmsApi.Infrastructure.Services;
 namespace TmsApi.Application.Enrollments.Queries;
 public class GetStudentScheduleHandler(IEnrollmentService repo)
 : IRequestHandler<GetStudentScheduleQuery, ScheduleDto>

@@ -1,5 +1,5 @@
 using TmsApi.Application.DTOs;
-
+using TmsApi.Domain.Entities;
 namespace TmsApi.Infrastructure.Services;
 
 public interface IEnrollmentService
@@ -14,6 +14,10 @@ Task<EnrollmentResponseDto> CreateAsync(
     CancellationToken ct);
 Task<List<EnrollmentResponseDto>> GetByCourseAsync(
     int courseId,
+    CancellationToken ct);
+
+Task<List<Enrollment>> GetByStudentIdAsync(
+    int studentId,
     CancellationToken ct);
 
 }

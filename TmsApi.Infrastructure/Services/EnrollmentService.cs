@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TmsApi.Domain.Entities;
@@ -6,7 +5,6 @@ using TmsApi.Application.DTOs;
 using TmsApi.Infrastructure.Persistence;
 
 namespace TmsApi.Infrastructure.Services;
-
 
 public class EnrollmentService(
     TmsDbContext context,
@@ -17,7 +15,6 @@ public class EnrollmentService(
         int courseId,
         int id,
         CancellationToken ct) =>
-
         context.Enrollments
             .AsNoTracking()
             .Where(e => e.Id == id && e.CourseId == courseId)
@@ -32,17 +29,29 @@ public class EnrollmentService(
     public async Task<List<EnrollmentResponseDto>> GetByCourseAsync(
         int courseId,
         CancellationToken ct)
-        {
-            return await context.Enrollments
-                .AsNoTracking()
-                .Where(e => e.CourseId == courseId)
-                .Select(e => new EnrollmentResponseDto(
-                    e.Id,
-                    e.CourseId,
-                    e.StudentId,
-                    e.EnrolledAt))
-                .ToListAsync(ct);
-        }        
+    {
+        return await context.Enrollments
+            .AsNoTracking()
+            .Where(e => e.CourseId == courseId)
+            .Select(e => new EnrollmentResponseDto(
+                e.Id,
+                e.CourseId,
+                e.StudentId,
+                e.EnrolledAt))
+            .ToListAsync(ct);
+    }
+
+
+    public async Task<List<Enrollment>> GetByStudentIdAsync(
+        int studentId,
+        CancellationToken ct)
+    {
+        return await context.Enrollments
+            .AsNoTracking()
+            .Where(e => e.StudentId == studentId)
+            .Include(e => e.Course)
+            .ToListAsync(ct);
+    }
 
 
     public async Task<EnrollmentResponseDto> CreateAsync(
@@ -67,8 +76,8 @@ public class EnrollmentService(
             enrollment.CourseId);
 
         return (await GetByIdAsync(
-             courseId,
-             enrollment.Id, 
-             ct))!;
+            courseId,
+            enrollment.Id,
+            ct))!;
     }
 }
