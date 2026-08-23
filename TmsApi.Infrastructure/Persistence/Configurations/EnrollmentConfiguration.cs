@@ -14,7 +14,7 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
             .IsRequired();
 
         builder.Property(e => e.Grade)
-            .HasPrecision(3, 2);
+            .HasPrecision(5, 2);
 
         
         // Student → Enrollment (1 to many)

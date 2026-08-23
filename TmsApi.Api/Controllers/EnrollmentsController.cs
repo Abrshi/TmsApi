@@ -1,16 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using TmsApi.Application.DTOs;
-
+using TmsApi.Application.Hubs;
+using TmsApi.Api.Hubs;
+using TmsApi.Application.Interfaces;
 using TmsApi.Infrastructure.Services;
-using TmsApi.Infrastructure.Persistence.Configurations;
 
-namespace TmsApi.Api.Controllers; // ✅ Fix: Matches TmsApi.Api format
+namespace TmsApi.Api.Controllers;
 
 [ApiController]
-[Route("api/courses/{courseId:int}/enrollments")]
+[Route("api/v2/courses/{courseId:int}/enrollments")]
 public class EnrollmentsController(
     ICourseService courseService,
-    IEnrollmentService enrollmentService) // ✅ Fix: Clean interface reference
+    IEnrollmentService enrollmentService,
+    IHubContext<TmsHub, ITmsHubClient> hubContext)
     : ControllerBase
 {
     [HttpGet("{id:int}", Name = nameof(GetEnrollment))]
@@ -19,10 +22,10 @@ public class EnrollmentsController(
         int id,
         CancellationToken ct)
     {
-       var enrollment = await enrollmentService.GetByIdAsync(
-        courseId,
-        id,
-        ct);
+        var enrollment = await enrollmentService.GetByIdAsync(
+            courseId,
+            id,
+            ct);
 
         return enrollment is not null
             ? Ok(enrollment)
@@ -55,11 +58,10 @@ public class EnrollmentsController(
             });
         }
 
-         var enrollment = await enrollmentService.CreateAsync(
-                courseId,
-                request,
-                ct);
-
+        var enrollment = await enrollmentService.CreateAsync(
+            courseId,
+            request,
+            ct);
 
         return CreatedAtAction(
             nameof(GetEnrollment),
@@ -69,5 +71,31 @@ public class EnrollmentsController(
                 id = enrollment.Id
             },
             enrollment);
+    }
+
+    [HttpPost("{id:int}/approve")]
+    public async Task<IActionResult> Approve(
+        int courseId,
+        int id,
+        CancellationToken ct)
+    {
+        var enrollment = await enrollmentService.ApproveAsync(
+            courseId,
+            id,
+            ct);
+
+        if (enrollment is null)
+        {
+            return NotFound();
+        }
+
+        // The database has been successfully updated/committed.
+        // Now notify all connected Angular clients.
+        await hubContext.Clients.All
+            .ReceiveEnrollmentStatusUpdated(
+                id.ToString(),
+                "Approved");
+
+        return NoContent();
     }
 }
