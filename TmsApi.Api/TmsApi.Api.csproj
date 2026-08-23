@@ -16,6 +16,8 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
 
+    <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.8.0" />
+
     <PackageReference Include="Scalar.AspNetCore" Version="2.16.5" />
   </ItemGroup>
 
@@ -23,6 +25,10 @@
     <ProjectReference Include="..\TmsApi.Application\TmsApi.Application.csproj" />
     <ProjectReference Include="..\TmsApi.Infrastructure\TmsApi.Infrastructure.csproj" />
     <ProjectReference Include="..\TmsApi.Domain\TmsApi.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include=".\Hubs\TmsHub.cs" Link="Hubs\TmsHub.cs" />
   </ItemGroup>
 
 </Project>

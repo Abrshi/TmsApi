@@ -7,6 +7,7 @@ using TmsApi.Exercises;
 using TmsApi.Infrastructure.Services;
 using Asp.Versioning;
 using TmsApi.Api.Middleware;
+using TmsApi.Api.Hubs;
 
 using TmsApi.Application.Enrollments.Commands;
 
@@ -18,11 +19,87 @@ using FluentValidation;
 using MediatR;
 using TmsApi.Api.ExceptionHandlers;
 using TmsApi.Application.Behaviors;
+
+using Microsoft.Extensions.Caching.Hybrid;
+
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using TmsApi.Api.RateLimiting;
+using System.Threading.Channels;
+using TmsApi.Application.Transcripts;
+using TmsApi.Infrastructure.Workers;
+using TmsApi.Infrastructure.Transcripts;
+
 var builder = WebApplication.CreateBuilder(args);
 
 //  SERVICES 
-
-
+builder.Services.AddCors(options =>
+{
+options.AddPolicy("AllowAngular", policy =>
+policy.WithOrigins("http://localhost:4200")
+.AllowAnyHeader()
+.AllowAnyMethod());
+});
+builder.Services.AddRateLimiter(options =>
+{
+options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext,
+string>(httpContext =>
+{
+var (partitionKey, tier) = ApiKeyResolver.Resolve(httpContext);
+return tier switch
+{ApiKeyTier.Paid => RateLimitPartition.GetTokenBucketLimiter(
+partitionKey: $"paid:{partitionKey}",
+factory: _ => new TokenBucketRateLimiterOptions
+{
+TokenLimit = 200,
+TokensPerPeriod = 100,
+ReplenishmentPeriod = TimeSpan.FromSeconds(10),
+QueueLimit = 0,
+AutoReplenishment = true
+}),
+ApiKeyTier.Free => RateLimitPartition.GetTokenBucketLimiter(
+partitionKey: $"free:{partitionKey}",
+factory: _ => new TokenBucketRateLimiterOptions
+{
+TokenLimit = 30,
+TokensPerPeriod = 10,
+ReplenishmentPeriod = TimeSpan.FromSeconds(10),
+QueueLimit = 0,
+AutoReplenishment = true
+}),
+_ => RateLimitPartition.GetTokenBucketLimiter(
+partitionKey: $"anon:{partitionKey}",
+factory: _ => new TokenBucketRateLimiterOptions
+{
+TokenLimit = 10,
+TokensPerPeriod = 5,
+ReplenishmentPeriod = TimeSpan.FromSeconds(10),
+QueueLimit = 0,
+AutoReplenishment = true
+})
+};
+});
+options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+options.OnRejected = async (context, ct) =>
+{
+var retryAfter = "10";
+if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var
+ts))
+retryAfter = ((int)ts.TotalSeconds).ToString();
+context.HttpContext.Response.Headers.RetryAfter = retryAfter;
+context.HttpContext.Response.ContentType =
+"application/problem+json";
+await context.HttpContext.Response.WriteAsJsonAsync(new
+ProblemDetails
+{
+Title = "Rate limit exceeded",
+Detail = $"Too many requests. Retry after {retryAfter} seconds.",
+Status = StatusCodes.Status429TooManyRequests,
+Type = "https://tms.local/errors/rate_limit_exceeded"
+}, ct);
+};
+});
 
 builder.Services.AddMediatR(cfg =>
 cfg.RegisterServicesFromAssembly(typeof(EnrollStudentHandler).Assembly));
@@ -32,6 +109,18 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>),typeof(LoggingBehavio
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidationBehavior<,>));
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+
+builder.Services.AddSingleton(Channel.CreateBounded<TranscriptRequest>(
+ new BoundedChannelOptions(100)
+ {
+ FullMode = BoundedChannelFullMode.Wait
+ }));
+
+ builder.Services.AddHostedService<TranscriptWorker>();
+
+builder.Services.AddSignalR();
+
 
 
 builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
@@ -85,11 +174,32 @@ options.UseNpgsql(builder.Configuration.GetConnectionString("TmsDatabase"))
 .EnableSensitiveDataLogging()); // Show parameters in querylogs (dev only)
 
 
+builder.Services.AddSingleton<ITranscriptStatusStore, InMemoryTranscriptStatusStore>();
+
 
 builder.Services.AddScoped<ICourseService, CourseService>();
 
+builder.Services.AddHybridCache(options =>
+{
+options.DefaultEntryOptions = new HybridCacheEntryOptions
+{
+Expiration = TimeSpan.FromMinutes(10),
+LocalCacheExpiration = TimeSpan.FromMinutes(2)
+};
+});
+// Production-only leave commented in lab
+// builder.Services.AddStackExchangeRedisCache(options =>
+// {
+// options.Configuration =builder.Configuration.GetConnectionString("Redis");
+// options.InstanceName = "tms:";
+// });
+// builder.Services.AddHybridCache();
 
+builder.Services.AddScoped<ICachedCourseService, CachedCourseService>();
 var app = builder.Build();
+app.MapHub<TmsHub>("/hubs/tms");
+
+app.UseCors("AllowAngular");
  app.UseExceptionHandler();
 //  MIDDLEWARE 
 
@@ -169,10 +279,10 @@ using (var scope = app.Services.CreateScope())
 
         var enrollments = new List<Enrollment>
         {
-            new() { StudentId = students[0].Id, CourseId = courses[0].Id, Grade = 4.0m },
-            new() { StudentId = students[0].Id, CourseId = courses[1].Id, Grade = 3.6m },
-            new() { StudentId = students[1].Id, CourseId = courses[0].Id, Grade = 2.8m },
-            new() { StudentId = students[3].Id, CourseId = courses[1].Id, Grade = 3.9m }
+            new() { StudentId = students[0].Id, CourseId = courses[0].Id, Grade = 95.0m },
+            new() { StudentId = students[0].Id, CourseId = courses[1].Id, Grade = 90.0m },
+            new() { StudentId = students[1].Id, CourseId = courses[0].Id, Grade = 80.0m },
+            new() { StudentId = students[3].Id, CourseId = courses[1].Id, Grade = 85.0m }
         };
 
         context.Enrollments.AddRange(enrollments);
