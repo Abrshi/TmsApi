@@ -12,7 +12,7 @@ using TmsApi.Infrastructure.Services;
 namespace TmsApi.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v2/[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly UserManager<TmsUser> _userManager;
