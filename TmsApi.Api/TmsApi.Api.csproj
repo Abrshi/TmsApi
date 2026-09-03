@@ -1,14 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>cab26e47-cff5-4557-b910-ff6e0b9f549b</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Http" Version="10.0.0" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
 
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10">
@@ -19,6 +21,8 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.8.0" />
 
     <PackageReference Include="Scalar.AspNetCore" Version="2.16.5" />
+
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.22.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,5 +34,11 @@
   <ItemGroup>
     <Compile Include=".\Hubs\TmsHub.cs" Link="Hubs\TmsHub.cs" />
   </ItemGroup>
+  <ItemGroup>
+<AssemblyAttribute
+Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+<_Parameter1>TmsApi.Tests</_Parameter1>
+</AssemblyAttribute>
+</ItemGroup>
 
 </Project>

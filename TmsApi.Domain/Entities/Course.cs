@@ -10,5 +10,7 @@ public class Course
 
     public int MaxCapacity { get; set; }
 
+    public string InstructorId { get; set; }
+
     public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 }
